@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCM - Travailler en équipe avec le numérique</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1E1E1E;
+            --card-hover: #262626;
+            --text-color: #E0E0E0;
+            --text-muted: #9E9E9E;
+            --accent-color: #DEFF9A;
+            --accent-hover: #c9f578;
+            --correct-color: #4EAE67;
+            --correct-bg: rgba(78, 174, 103, 0.15);
+            --wrong-color: #FF6B6B;
+            --wrong-bg: rgba(255, 107, 107, 0.15);
+            --border-color: #2F2F2F;
+            --border-radius: 14px;
+            --font-stack: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-stack);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            line-height: 1.5;
+        }
+
+        .quiz-wrapper {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 780px;
+            padding: 28px;
+            position: relative;
+        }
+
+        /* En-tête */
+        .quiz-header {
+            margin-bottom: 22px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 18px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(222, 255, 154, 0.12);
+            color: var(--accent-color);
+            border: 1px solid rgba(222, 255, 154, 0.25);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-pill {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background-color: #121212;
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 1.55rem;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        /* Progression */
+        .progress-section {
+            margin-top: 14px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background-color: #121212;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #A8E85A, var(--accent-color));
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+
+        /* Questions */
+        .question-card {
+            margin: 20px 0;
+        }
+
+        .question-number {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .question-title {
+            font-size: 1.18rem;
+            color: #FFFFFF;
+            font-weight: 600;
+            margin-bottom: 18px;
+            line-height: 1.4;
+        }
+
+        /* Réponses */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-button {
+            background-color: #232323;
+            border: 1.5px solid #333333;
+            border-radius: 10px;
+            color: var(--text-color);
+            padding: 14px 16px;
+            font-size: 0.98rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-family: inherit;
+        }
+
+        .option-button:hover:not(:disabled) {
+            background-color: var(--card-hover);
+            border-color: var(--accent-color);
+            transform: translateX(4px);
+        }
+
+        .option-button:disabled {
+            cursor: default;
+        }
+
+        .option-button.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-color);
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .option-button.correct::after {
+            content: "✓";
+            color: var(--correct-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .option-button.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-color);
+            color: #FFFFFF;
+        }
+
+        .option-button.wrong::after {
+            content: "✕";
+            color: var(--wrong-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .option-button.dimmed {
+            opacity: 0.45;
+        }
+
+        /* Feedback */
+        .feedback-container {
+            margin-top: 18px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .feedback-container.correct {
+            background-color: var(--correct-bg);
+            border-left: 4px solid var(--correct-color);
+        }
+
+        .feedback-container.wrong {
+            background-color: var(--wrong-bg);
+            border-left: 4px solid var(--wrong-color);
+        }
+
+        .feedback-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .feedback-container.correct .feedback-title {
+            color: var(--correct-color);
+        }
+
+        .feedback-container.wrong .feedback-title {
+            color: var(--wrong-color);
+        }
+
+        .feedback-text {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            line-height: 1.45;
+        }
+
+        /* Actions */
+        .actions-row {
+            margin-top: 22px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            background-color: var(--accent-color);
+            color: #121212;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(222, 255, 154, 0.25);
+        }
+
+        .btn-action:disabled {
+            background-color: #2D2D2D;
+            color: #666666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Écran des résultats */
+        .results-view {
+            text-align: center;
+            padding: 10px 0;
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .score-circle-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            background: #171717;
+            border: 4px solid var(--accent-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 24px rgba(222, 255, 154, 0.15);
+        }
+
+        .score-val {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            line-height: 1;
+        }
+
+        .score-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .results-view h2 {
+            font-size: 1.5rem;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+
+        .result-description {
+            font-size: 0.98rem;
+            color: var(--text-color);
+            max-width: 580px;
+            margin: 0 auto 24px auto;
+            line-height: 1.5;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-width: 360px;
+            margin: 0 auto 24px auto;
+        }
+
+        .stat-box {
+            background-color: #151515;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .stat-num {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .stat-num.succ { color: var(--correct-color); }
+        .stat-num.err { color: var(--wrong-color); }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .quiz-wrapper {
+                padding: 18px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+            .question-title {
+                font-size: 1.05rem;
+            }
+            .option-button {
+                padding: 12px 14px;
+                font-size: 0.9rem;
+            }
+            .score-circle-wrapper {
+                width: 130px;
+                height: 130px;
+            }
+            .score-val {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-wrapper">
+        <!-- VUE QUESTIONNAIRE -->
+        <div id="quiz-view">
+            <div class="quiz-header">
+                <div class="header-top">
+                    <span class="tag-badge">🤝 Co-création &amp; Travail en Équipe</span>
+                    <span class="score-pill" id="live-score">Score : 0 / 40</span>
+                </div>
+                <h1>Travailler en équipe avec le numérique</h1>
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span>Progression</span>
+                        <span id="progress-text">Question 1 sur 40</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-number" id="question-index-label">Question 1</div>
+                <div class="question-title" id="question-text">Chargement de la question...</div>
+                <div class="options-list" id="options-container"></div>
+            </div>
+
+            <div class="feedback-container" id="feedback-box">
+                <div class="feedback-title" id="feedback-title">Bonne réponse !</div>
+                <div class="feedback-text" id="feedback-desc">Explication pédagogique...</div>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn-action" id="next-btn" disabled>Question suivante ➔</button>
+            </div>
+        </div>
+
+        <!-- VUE RÉSULTATS -->
+        <div class="results-view" id="results-view">
+            <span class="tag-badge" style="margin-bottom: 14px;">Bilan de Coopération Numérique</span>
+            
+            <div class="score-circle-wrapper">
+                <div class="score-val" id="final-percent">0%</div>
+                <div class="score-sub">Score Final</div>
+            </div>
+
+            <h2 id="result-title-text">Niveau de Coopération</h2>
+            <p class="result-description" id="result-desc-text">Commentaire d'évaluation...</p>
+
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <div class="stat-num succ" id="stat-correct-count">0</div>
+                    <div class="stat-label">Réponses correctes</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num err" id="stat-wrong-count">0</div>
+                    <div class="stat-label">Erreurs / Pièges</div>
+                </div>
+            </div>
+
+            <button class="btn-action" onclick="restartQuiz()">🔄 Recommencer l'évaluation</button>
+        </div>
+    </div>
+
+    <script>
+        const rawQuestions = [
+            // Slide 2 : La Révolution du Groupe (Avant vs Aujourd'hui)
+            {
+                q: "Avant la collaboration en ligne, quelle était l'une des contraintes majeures pour faire un travail de groupe ?",
+                options: [
+                    "On devait obligatoirement se regrouper à la récréation ou chez soi",
+                    "On pouvait écrire en direct sur le même écran à distance",
+                    "Les documents se synchronisaient automatiquement sans clé USB",
+                    "Le professeur corrigeait le document en temps réel"
+                ],
+                answer: 0,
+                feedback: "Avant, le travail de groupe imposait une présence physique à la récréation ou à la maison, limitant l'avancée du projet."
+            },
+            {
+                q: "Quel risque courait-on autrefois en s'échangeant des clés USB entre camarades ?",
+                options: [
+                    "Le risque d'écraser ou de perdre son fichier de travail",
+                    "L'apparition de commentaires instantanés sur l'écran",
+                    "La création automatique d'une copie sur le Cloud",
+                    "Une amélioration trop rapide de la mise en page"
+                ],
+                answer: 0,
+                feedback: "L'échange de clés USB physique entraînait souvent des pertes de données, des oublis ou des conflits de versions."
+            },
+            {
+                q: "Aujourd'hui, que permet le travail collaboratif en ligne par rapport à l'ancienne méthode ?",
+                options: [
+                    "Travailler sur le même document en même temps tout en voyant les idées des autres",
+                    "Obliger un seul élève à faire tout le devoir pendant que les autres regardent",
+                    "Empêcher le professeur d'accéder aux devoirs",
+                    "Supprimer le besoin de réfléchir et de structurer ses idées"
+                ],
+                answer: 0,
+                feedback: "En ligne, tout le monde peut contribuer simultanément sur le même document, ce qui accélère la progression collective."
+            },
+            {
+                q: "Où reste enregistré le travail lors d'une session collaborative moderne ?",
+                options: [
+                    "Toujours au même endroit sur le Cloud/serveur partagé",
+                    "Uniquement dans la mémoire vive de l'ordinateur de l'école",
+                    "Sur une disquette magnétique chez l'un des élèves",
+                    "Dans la corbeille de l'ordinateur"
+                ],
+                answer: 0,
+                feedback: "Les modifications sont enregistrées en direct au même endroit centralisé et sécurisé."
+            },
+
+            // Slide 3 : C'est quoi la collaboration ?
+            {
+                q: "Selon la règle de « L'esprit d'équipe numérique », que N'EST PAS le travail en groupe ?",
+                options: [
+                    "Ce n'est pas faire le travail d'un camarade à sa place",
+                    "Ce n'est pas s'entraider sur un projet commun",
+                    "Ce n'est pas partager ses compétences",
+                    "Ce n'est pas utiliser un éditeur de texte en ligne"
+                ],
+                answer: 0,
+                feedback: "Collaborer, ce n'est pas tout faire seul à la place des autres, mais coordonner les efforts de chacun."
+            },
+            {
+                q: "Quelle formule illustre la « force décuplée » de la collaboration d'équipe ?",
+                options: [
+                    "1 + 1 + 1 = Une force décuplée",
+                    "1 - 1 = Zéro travail",
+                    "1 × 0 = Moins d'efforts",
+                    "1 + 1 = Diviser les notes"
+                ],
+                answer: 0,
+                feedback: "L'addition des compétences individuelles permet d'aboutir à un projet bien plus riche et complet."
+            },
+            {
+                q: "Si l'Élève 1 cherche les infos, l'Élève 2 rédige le texte et l'Élève 3 fait la présentation, quel est le résultat final ?",
+                options: [
+                    "Additionner les compétences pour un projet bien plus riche que si un élève l'avait fait seul",
+                    "Perdre du temps par rapport à un travail solitaire",
+                    "Créer trois exposés complètement séparés",
+                    "Avoir des fautes d'orthographe partout"
+                ],
+                answer: 0,
+                feedback: "La répartition intelligente des rôles valorise les forces de chaque élève pour un rendu de haute qualité."
+            },
+
+            // Slide 4 : Cerveaux connectés : La force du groupe en chiffres
+            {
+                q: "Pourquoi travailler à 4 sur un exposé permet-il de trouver « 4x plus d'idées » ?",
+                options: [
+                    "Parce que la phase de réflexion bénéficie de 4 cerveaux connectés",
+                    "Parce que le logiciel invente des idées tout seul",
+                    "Parce qu'on recopie 4 fois la même page sur Internet",
+                    "Parce que l'exposé doit faire 400 pages"
+                ],
+                answer: 0,
+                feedback: "La mise en commun des réflexions multiplie les angles de vue et la créativité du groupe."
+            },
+            {
+                q: "Quel avantage le travail à plusieurs apporte-t-il pour la relecture du document ?",
+                options: [
+                    "Les fautes d'orthographe et les oublis sont repérés beaucoup plus vite",
+                    "Le texte est traduit automatiquement en 5 langues",
+                    "Les fautes d'orthographe disparaissent sans relecture",
+                    "Le professeur ne vérifie plus l'orthographe"
+                ],
+                answer: 0,
+                feedback: "Plusieurs regards attentifs permettent de détecter immédiatement les coquilles et omissions."
+            },
+            {
+                q: "Quel est l'impact d'une bonne organisation d'équipe sur la gestion du temps et du stress ?",
+                options: [
+                    "La présentation est terminée dans les temps, avec ZÉRO stress",
+                    "Le travail est obligatoirement rendu en retard",
+                    "Le stress est multiplié par quatre",
+                    "L'équipe doit travailler toute la nuit avant le cours"
+                ],
+                answer: 0,
+                feedback: "En divisant la charge de travail, l'équipe termine sereinement dans les délais impartis."
+            },
+
+            // Slide 5 : Le Quartier Général Numérique (ENT vs Cloud)
+            {
+                q: "À quoi sert « L'ENT du Collège » en tant qu'espace sécurisé ?",
+                options: [
+                    "À retrouver ses cours, ses projets personnels et être guidé directement par son professeur",
+                    "À télécharger des jeux vidéo payants gratuitement",
+                    "À publier des vidéos privées visibles par tout Internet",
+                    "À remplacer les cahiers de dessin"
+                ],
+                answer: 0,
+                feedback: "L'ENT est le cadre institutionnel officiel sécurisé pour suivre la scolarité et déposer les devoirs."
+            },
+            {
+                q: "Qu'est-ce que « Le Nuage / Cloud Scolaire » (Espace Partagé) ?",
+                options: [
+                    "Un dossier commun accessible 24h/24 où toute l'équipe dépose images et textes",
+                    "Une application météo pour observer la pluie",
+                    "Un disque dur physique enfermé dans le bureau du principal",
+                    "Une imprimante connectée en Bluetooth"
+                ],
+                answer: 0,
+                feedback: "Le Cloud scolaire permet de centraliser toutes les ressources de l'exposé sans risquer d'oublier de feuille ou de clé."
+            },
+            {
+                q: "Pourquoi le Cloud scolaire met-il fin aux « feuilles imprimées oubliées » ?",
+                options: [
+                    "Parce que les fichiers sont accessibles en ligne 24h/24 depuis n'importe quel ordinateur connecté",
+                    "Parce qu'il est interdit d'écrire des textes au collège",
+                    "Parce que les imprimantes n'existent plus",
+                    "Parce que les devoirs ne sont plus notés"
+                ],
+                answer: 0,
+                feedback: "Grâce à la disponibilité permanente en ligne, les documents ne sont plus tributaires d'un support papier."
+            },
+
+            // Slide 6 : La Magie du Navigateur (Éditeurs en ligne)
+            {
+                q: "Qu'appelle-t-on un « éditeur en ligne » selon le cours ?",
+                options: [
+                    "Un logiciel qui s'ouvre et fonctionne directement dans ton navigateur internet comme un site web",
+                    "Un robot qui écrit le devoir à ta place",
+                    "Une personne qui imprime les livres au collège",
+                    "Un câble de connexion pour relier deux ordinateurs"
+                ],
+                answer: 0,
+                feedback: "Les éditeurs en ligne s'exécutent dans le navigateur sans installation locale."
+            },
+            {
+                q: "Quel est le grand avantage technique des éditeurs en ligne sur le matériel des élèves ?",
+                options: [
+                    "Pas besoin d'un ordinateur puissant : on ne télécharge et n'installe absolument rien !",
+                    "Ils fonctionnent même si l'ordinateur n'a pas d'écran",
+                    "Ils rendent l'ordinateur 10 fois plus lourd",
+                    "Ils suppriment la batterie de la tablette"
+                ],
+                answer: 0,
+                feedback: "Aucun téléchargement lourd n'est requis : un simple navigateur web suffit pour créer."
+            },
+            {
+                q: "Quels types d'outils peut-on utiliser directement dans son navigateur web pour co-créer ?",
+                options: [
+                    "Logiciel de texte, outil de présentation (diaporama), carte mentale ou affiche",
+                    "Uniquement une calculatrice simple",
+                    "Uniquement un lecteur de disquette",
+                    "Des jeux en ligne sans rapport avec le cours"
+                ],
+                answer: 0,
+                feedback: "Le navigateur permet de concevoir des textes, diaporamas, cartes mentales et affiches collaboratives."
+            },
+
+            // Slide 7 : Le super-pouvoir du Temps Réel
+            {
+                q: "Que se passe-t-il en mode « Temps Réel » lorsqu'un camarade écrit une phrase depuis chez lui ?",
+                options: [
+                    "La phrase s'affiche instantanément sur ton propre écran",
+                    "Il faut attendre le lendemain pour voir la modification",
+                    "Le document se bloque pendant une heure",
+                    "L'ordinateur redémarre automatiquement"
+                ],
+                answer: 0,
+                feedback: "La synchronisation en temps réel permet de voir instantanément les frappes et modifications de ses équipiers."
+            },
+            {
+                q: "Comment repère-t-on les différents équipiers en direct sur un document collaboratif ?",
+                options: [
+                    "Chaque élève possède une couleur de curseur différente avec son prénom",
+                    "Chaque élève doit écrire avec une police de caractères différente",
+                    "Les élèves doivent s'appeler au téléphone toutes les 2 minutes",
+                    "L'écran clignote en rouge à chaque mot tapé"
+                ],
+                answer: 0,
+                feedback: "Les curseurs colorés nominatifs indiquent précisément qui écrit ou sélectionne du texte en direct."
+            },
+            {
+                q: "Pourquoi les curseurs colorés sont-ils qualifiés de « super-pouvoir » ?",
+                options: [
+                    "Parce que tu sais toujours qui fait quoi, en direct !",
+                    "Parce qu'ils permettent d'effacer le travail du professeur",
+                    "Parce qu'ils augmentent la luminosité de l'écran",
+                    "Parce qu'ils changent la langue de l'ordinateur"
+                ],
+                answer: 0,
+                feedback: "Ils offrent une transparence totale sur la répartition et l'avancement des tâches en temps réel."
+            },
+
+            // Slide 8 : La machine à remonter le temps (Historique des versions)
+            {
+                q: "Que fait le système d'historique des versions pendant que l'équipe travaille ?",
+                options: [
+                    "Il enregistre chaque modification minute par minute",
+                    "Il prend une photo de la classe",
+                    "Il supprime les anciennes versions après 5 minutes",
+                    "Il envoie une alerte à la police"
+                ],
+                answer: 0,
+                feedback: "Le système garde en mémoire chaque étape du document sous forme d'historique horodaté."
+            },
+            {
+                q: "Si un camarade supprime par erreur un paragraphe ou l'image principale, que faut-il faire ?",
+                options: [
+                    "Pas de panique ! Utiliser l'historique des versions (Undo/Restore) pour restaurer la bonne version",
+                    "Recommencer tout l'exposé depuis la première page",
+                    "Supprimer le compte de son camarade",
+                    "Éteindre l'ordinateur et abandonner le projet"
+                ],
+                answer: 0,
+                feedback: "La fonction 'Historique des versions' ou 'Restaurer' permet de revenir à l'état antérieur en deux clics."
+            },
+            {
+                q: "Quelle commande/fonction permet d'annuler une bêtise ou de revenir en arrière dans l'historique ?",
+                options: [
+                    "La fonction Undo / Restaurer la version précédente",
+                    "La touche Arrêt d'urgence du collège",
+                    "Le formatage complet du disque dur",
+                    "La création d'un nouveau profil ENT"
+                ],
+                answer: 0,
+                feedback: "Undo / Restore permet d'effacer l'erreur sans aucune perte de travail."
+            },
+
+            // Slide 9 : Communiquer sans effacer
+            {
+                q: "Pour collaborer sereinement, que signifie l'action d'« Encourager » ?",
+                options: [
+                    "Laisser un petit commentaire positif quand un camarade a fait du bon travail",
+                    "Mettre une mauvaise note à son voisin",
+                    "Écrire 'C'est nul' en gros sur la page",
+                    "Supprimer les phrases des autres sans prévenir"
+                ],
+                answer: 0,
+                feedback: "Un commentaire positif valorise l'investissement de ses coéquipiers et entretient une bonne dynamique."
+            },
+            {
+                q: "Comment doit-on « Suggérer » une amélioration sans être agressif ?",
+                options: [
+                    "Proposer une idée ou une modification sous forme de commentaire/suggestion sans effacer directement le texte de l'autre",
+                    "Effacer discrètement le texte de son camarade pendant qu'il a le dos tourné",
+                    "Écrire en majuscules rouges sur le document",
+                    "Envoyer un message anonyme pour critiquer"
+                ],
+                answer: 0,
+                feedback: "Le mode suggestion propose des pistes d'amélioration tout en préservant le texte initial."
+            },
+            {
+                q: "Que fait-on lorsqu'on utilise la fonction « Questionner » sur un mot difficile ou flou ?",
+                options: [
+                    "On surligne le passage pour demander des précisions à son camarade en commentaire",
+                    "On supprime immédiatement le mot sans rien dire",
+                    "On remplace le mot par un dessin rigolo",
+                    "On quitte le groupe de travail"
+                ],
+                answer: 0,
+                feedback: "Surligner et poser une question permet de clarifier une formulation ensemble."
+            },
+            {
+                q: "Que signifie la phase « Valider » dans les commentaires d'un document partagé ?",
+                options: [
+                    "Accepter ou refuser les corrections ensemble, après en avoir discuté calmement",
+                    "Accepter toutes les modifications sans les lire",
+                    "Refuser toutes les idées proposées par les autres",
+                    "Fermer le document sans enregistrer"
+                ],
+                answer: 0,
+                feedback: "La validation est une décision d'équipe issue d'un consensus calme et réfléchi."
+            },
+
+            // Slide 10 : L'Équipe de Choc : Choisis ton Rôle !
+            {
+                q: "Combien de rôles clés sont présentés dans « L'Équipe de Choc » pour mener un projet d'exposé ?",
+                options: [
+                    "4 rôles (Le Chercheur, Le Rédacteur, L'Illustrateur, Le Relecteur)",
+                    "2 rôles (Le Chef et l'Exécutant)",
+                    "1 seul rôle pour toute la classe",
+                    "10 rôles différents"
+                ],
+                answer: 0,
+                feedback: "L'équipe s'articule autour de 4 missions complémentaires : Chercheur, Rédacteur, Illustrateur et Relecteur."
+            },
+            {
+                q: "Pourquoi est-il crucial de bien se répartir les rôles au début du projet ?",
+                options: [
+                    "Pour réussir en s'assurant que chaque mission vitale est prise en charge sans doublon",
+                    "Pour qu'un seul élève travaille pendant que les autres s'amusent",
+                    "Pour pouvoir accuser un camarade en cas de mauvaise note",
+                    "Pour rendre 4 devoirs complètement différents"
+                ],
+                answer: 0,
+                feedback: "Une répartition claire des responsabilités responsabilise chaque membre et fluidifie la co-création."
+            },
+
+            // Slide 11 : Les Créateurs de Contenu (Chercheur & Rédacteur)
+            {
+                q: "Quelle est la mission principale du « Chercheur » (L'explorateur du web) ?",
+                options: [
+                    "Trouver les informations fiables et vérifier les sources sur Internet",
+                    "Corriger les fautes d'orthographe à la fin",
+                    "Choisir les couleurs du titre",
+                    "Imprimer le document au secrétariat"
+                ],
+                answer: 0,
+                feedback: "Le Chercheur explore le Web avec méthode pour dénicher des informations solides et fiables."
+            },
+            {
+                q: "Quelle est « l'arme numérique » privilégiée du Chercheur ?",
+                options: [
+                    "Le moteur de recherche + Le dossier partagé (pour stocker les liens et ressources)",
+                    "La manette de console de jeux",
+                    "Le pinceau virtuel de retouche",
+                    "Le tableur de calcul automatique"
+                ],
+                answer: 0,
+                feedback: "Il associe un moteur adapté à un dossier Cloud partagé pour archiver les liens trouvés."
+            },
+            {
+                q: "Quelle est la mission principale du « Rédacteur » (Le maître des mots) ?",
+                options: [
+                    "Écrire les résumés, structurer les phrases de l'exposé et donner vie aux idées",
+                    "Trouver des photos sur Pixabay",
+                    "Vérifier le mot de passe de l'ENT",
+                    "Supprimer les paragraphes du Chercheur"
+                ],
+                answer: 0,
+                feedback: "Le Rédacteur transforme les données brutes en un texte fluide, clair et bien structuré."
+            },
+            {
+                q: "Quelle arme numérique utilise principalement le Rédacteur ?",
+                options: [
+                    "L'éditeur de texte en ligne",
+                    "Le logiciel de montage vidéo professionnel",
+                    "La boîte de dialogue des paramètres système",
+                    "Uniquement un crayon de papier"
+                ],
+                answer: 0,
+                feedback: "Il travaille directement sur le traitement de texte en ligne partagé avec l'équipe."
+            },
+
+            // Slide 12 : Les Maîtres de la Forme (Illustrateur & Relecteur)
+            {
+                q: "Quelle est la mission principale de « L'Illustrateur » (L'artiste visuel) ?",
+                options: [
+                    "Rechercher des images claires, lisibles et surtout libres de droits pour décorer l'exposé",
+                    "Rédiger l'introduction de 50 lignes",
+                    "Calculer des moyennes de notes",
+                    "Envoyer des courriels à l'administration"
+                ],
+                answer: 0,
+                feedback: "L'Illustrateur valorise l'exposé avec des visuels pertinents, légaux et esthétiques."
+            },
+            {
+                q: "Quelle arme numérique l'Illustrateur manipule-t-il en priorité ?",
+                options: [
+                    "L'outil de présentation / Diaporama en ligne",
+                    "La ligne de commande informatique",
+                    "Le logiciel de gestion des absences",
+                    "La calculatrice scientifique"
+                ],
+                answer: 0,
+                feedback: "Il met en page les diapositives ou l'affiche à l'aide d'un outil de présentation partagé."
+            },
+            {
+                q: "Quelle est la mission principale du « Relecteur » (Le gardien de la qualité) ?",
+                options: [
+                    "Vérifier l'orthographe, lisser la mise en page finale et s'assurer que tout est parfait",
+                    "Chercher les premières informations sur Wikipédia",
+                    "Effacer les noms de ses camarades",
+                    "Changer le mot de passe du document"
+                ],
+                answer: 0,
+                feedback: "Le Relecteur apporte la touche finale de perfection : grammaire, syntaxe et harmonie visuelle."
+            },
+            {
+                q: "Quelle arme numérique le Relecteur utilise-t-il pour corriger sans tout casser ?",
+                options: [
+                    "L'outil 'Suivi des modifications' et l'ajout de commentaires",
+                    "La touche Retour arrière maintenue pendant 10 secondes",
+                    "La corbeille de l'ordinateur",
+                    "Le bouton déconnexion"
+                ],
+                answer: 0,
+                feedback: "Le suivi des modifications et les bulles de commentaires lui permettent de proposer des rectifications constructives."
+            },
+
+            // Slide 13 : La Quête en 4 Étapes
+            {
+                q: "Quelle est la toute première étape (Niveau 1) de la Quête d'un projet d'équipe ?",
+                options: [
+                    "Préparer : Créer le document vierge partagé et distribuer les rôles à chacun",
+                    "Partager : Envoyer le travail immédiatement au professeur",
+                    "Relire : Corriger les fautes d'un document vide",
+                    "Co-créer : Écrire tous en même temps sans plan"
+                ],
+                answer: 0,
+                feedback: "Niveau 1 : On pose les bases en créant le fichier partagé et en attribuant les rôles."
+            },
+            {
+                q: "En quoi consiste le Niveau 2 (« Co-créer ») de la Quête ?",
+                options: [
+                    "Rechercher des infos et rédiger ensemble, en même temps, sur le document",
+                    "Attendre que le professeur fasse l'exposé",
+                    "Supprimer les accès des autres élèves",
+                    "Imprimer le brouillon sur papier"
+                ],
+                answer: 0,
+                feedback: "Niveau 2 : C'est le cœur de la production où Chercheur et Rédacteur enrichissent le document commun."
+            },
+            {
+                q: "Quelle action caractérise le Niveau 3 (« Relire ») de la Quête ?",
+                options: [
+                    "Utiliser les bulles de commentaires pour corriger et améliorer le texte des autres",
+                    "Changer le sujet de l'exposé",
+                    "Ajouter 50 images sans rapport avec le sujet",
+                    "Valider le travail sans le relire"
+                ],
+                answer: 0,
+                feedback: "Niveau 3 : L'équipe affine et perfectionne le projet grâce aux suggestions et relectures croisées."
+            },
+            {
+                q: "Comment se déroule la dernière étape (Niveau 4 : « Partager ») ?",
+                options: [
+                    "Vérifier le rendu final tous ensemble et le livrer au professeur via l'ENT",
+                    "Envoyer le devoir par SMS à un camarade inconnu",
+                    "Effacer le fichier pour ne pas être copié",
+                    "Publier le document sur un réseau social public"
+                ],
+                answer: 0,
+                feedback: "Niveau 4 : Validation finale collective et dépôt officiel sur l'ENT du collège."
+            },
+
+            // Slide 14 & 15 : Le Code d'Honneur de l'Équipe
+            {
+                q: "Selon le Code d'Honneur, quelle règle régit le « Respect du travail » d'autrui ?",
+                options: [
+                    "Ne jamais effacer la partie d'un camarade sans lui demander son avis préalable (utiliser les suggestions)",
+                    "Effacer les paragraphes des autres si on pense écrire mieux qu'eux",
+                    "Remplacer le texte d'un copain par des blagues",
+                    "Verrouiller le document pour être le seul à écrire"
+                ],
+                answer: 0,
+                feedback: "Le respect mutuel impose de ne jamais supprimer le travail d'un camarade sans dialogue préalable."
+            },
+            {
+                q: "Quelle attitude de « Politesse en ligne » doit-on adopter dans la zone de discussion du document ?",
+                options: [
+                    "Écrire des messages polis, gentils et constructifs car derrière l'écran, il y a tes copains",
+                    "Utiliser un langage agressif en majuscules pour donner des ordres",
+                    "Se moquer des camarades qui font des fautes",
+                    "Ignorer les messages des autres membres de l'équipe"
+                ],
+                answer: 0,
+                feedback: "La communication interne doit toujours rester courtoise, encourageante et constructive."
+            },
+            {
+                q: "Concernant « Le Secret Absolu », à quoi est comparé ton mot de passe ENT ?",
+                options: [
+                    "À la clé de ta maison : garde-le strictement secret, même avec tes amis !",
+                    "À un bonbon que l'on partage avec toute la classe",
+                    "À un mot public écrit sur le tableau de la classe",
+                    "À une information sans importance"
+                ],
+                answer: 0,
+                feedback: "Ton mot de passe est strictement personnel : le donner à un tiers compromet la sécurité de ton espace."
+            },
+            {
+                q: "Quel est « Le Réflexe Final » indispensable après chaque séance de travail sur les ordinateurs du collège ?",
+                options: [
+                    "N'oublie jamais de te déconnecter de ton compte ENT / session",
+                    "Laisser sa session ouverte pour le cours suivant",
+                    "Changer le fond d'écran de l'ordinateur",
+                    "Débrancher les câbles de l'unité centrale"
+                ],
+                answer: 0,
+                feedback: "Se déconnecter empêche quiconque d'accéder à tes données ou d'usurper ton identité après ton départ."
+            },
+
+            // Slide 16 : La Recette Secrète d'un Super Projet
+            {
+                q: "D'après la recette secrète, quels sont les DEUX piliers qui représentent chacun 35% du succès du groupe (soit 70% au total) ?",
+                options: [
+                    "Entraide & Partage (35%) et Communication & Écoute (35%)",
+                    "La puissance de l'ordinateur (50%) et la rapidité du Wi-Fi (50%)",
+                    "L'achat de logiciels payants (70%) et les graphismes 3D (30%)",
+                    "Le travail solitaire (80%) et la chance (20%)"
+                ],
+                answer: 0,
+                feedback: "70% du succès repose sur les qualités humaines : l'entraide mutuelle et une communication bienveillante."
+            },
+            {
+                q: "Quelle part la technique (Utilisation des Outils Numériques) représente-t-elle dans la recette d'un super projet ?",
+                options: [
+                    "30%",
+                    "100%",
+                    "5%",
+                    "90%"
+                ],
+                answer: 0,
+                feedback: "La technique ne compte que pour 30% : ce sont l'entente et le respect entre camarades qui font la différence !"
+            },
+            {
+                q: "En conclusion, qu'est-ce qui fait avant tout le succès d'un groupe selon la mission ?",
+                options: [
+                    "L'entente, l'écoute et le respect entre camarades",
+                    "Avoir l'ordinateur le plus cher de la classe",
+                    "Faire le travail à la dernière minute",
+                    "Travailler sans jamais parler aux autres"
+                ],
+                answer: 0,
+                feedback: "Les outils numériques facilitent la tâche, mais la réussite repose entièrement sur la coopération humaine !"
+            }
+        ];
+
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        const quizView = document.getElementById('quiz-view');
+        const resultsView = document.getElementById('results-view');
+        const questionText = document.getElementById('question-text');
+        const questionIndexLabel = document.getElementById('question-index-label');
+        const optionsContainer = document.getElementById('options-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const liveScore = document.getElementById('live-score');
+        const feedbackBox = document.getElementById('feedback-box');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackDesc = document.getElementById('feedback-desc');
+        const nextBtn = document.getElementById('next-btn');
+
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(rawQuestions).map(q => {
+                const mappedOptions = q.options.map((optText, originalIndex) => ({
+                    text: optText,
+                    isCorrect: originalIndex === q.answer
+                }));
+                return {
+                    q: q.q,
+                    options: shuffleArray(mappedOptions),
+                    feedback: q.feedback
+                };
+            });
+
+            currentIndex = 0;
+            score = 0;
+            isAnswered = false;
+
+            quizView.style.display = 'block';
+            resultsView.style.display = 'none';
+            liveScore.innerText = `Score : 0 / ${questions.length}`;
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            isAnswered = false;
+            nextBtn.disabled = true;
+            feedbackBox.style.display = 'none';
+
+            const total = questions.length;
+            const currentNum = currentIndex + 1;
+            const qData = questions[currentIndex];
+
+            progressText.innerText = `Question ${currentNum} sur ${total}`;
+            questionIndexLabel.innerText = `Question ${currentNum} / ${total}`;
+            progressBar.style.width = `${(currentNum / total) * 100}%`;
+
+            questionText.innerText = qData.q;
+
+            optionsContainer.innerHTML = '';
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-button';
+                btn.innerText = opt.text;
+                btn.onclick = () => handleSelectOption(idx, opt.isCorrect);
+                optionsContainer.appendChild(btn);
+            });
+
+            if (currentIndex === total - 1) {
+                nextBtn.innerText = "Consulter le Bilan d'Équipe ➔";
+            } else {
+                nextBtn.innerText = "Question suivante ➔";
+            }
+        }
+
+        function handleSelectOption(selectedIdx, isCorrect) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const buttons = optionsContainer.querySelectorAll('.option-button');
+            const qData = questions[currentIndex];
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (qData.options[idx].isCorrect) {
+                    btn.classList.add('correct');
+                } else if (idx === selectedIdx) {
+                    btn.classList.add('wrong');
+                } else {
+                    btn.classList.add('dimmed');
+                }
+            });
+
+            if (isCorrect) {
+                score++;
+                feedbackBox.className = 'feedback-container correct';
+                feedbackTitle.innerText = "✓ Bonne réponse !";
+            } else {
+                feedbackBox.className = 'feedback-container wrong';
+                feedbackTitle.innerText = "✕ Mauvaise réponse !";
+            }
+
+            liveScore.innerText = `Score : ${score} / ${questions.length}`;
+            feedbackDesc.innerText = qData.feedback;
+            feedbackBox.style.display = 'block';
+
+            nextBtn.disabled = false;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function showResults() {
+            quizView.style.display = 'none';
+            resultsView.style.display = 'block';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+
+            document.getElementById('final-percent').innerText = `${percent}%`;
+            document.getElementById('stat-correct-count').innerText = score;
+            document.getElementById('stat-wrong-count').innerText = total - score;
+
+            const titleEl = document.getElementById('result-title-text');
+            const descEl = document.getElementById('result-desc-text');
+
+            if (percent >= 90) {
+                titleEl.innerText = "🏆 Capitaine de la Co-création Numérique !";
+                descEl.innerText = "Félicitations ! Tu maîtrises sur le bout des doigts la collaboration en ligne, les 4 rôles d'équipe (Chercheur, Rédacteur, Illustrateur, Relecteur), l'historique des versions, le travail en temps réel et le Code d'Honneur. Ton équipe va cartonner !";
+            } else if (percent >= 75) {
+                titleEl.innerText = "⭐ Coéquipier Exemplaire !";
+                descEl.innerText = "Très bon travail ! Tu as acquis d'excellents réflexes pour travailler en équipe, communiquer sans effacer, utiliser le Cloud scolaire et protéger tes accès.";
+            } else if (percent >= 50) {
+                titleEl.innerText = "🤝 Apprenti Collaborateur";
+                descEl.innerText = "Des bases solides, mais reste vigilant : revois la répartition précise des 4 rôles, l'utilisation des suggestions plutôt que l'effacement direct, et les 4 étapes de la quête collective.";
+            } else {
+                titleEl.innerText = "⚠️ Entraînement d'Équipe Nécessaire";
+                descEl.innerText = "Attention à ne pas faire cavalier seul ! Relis attentivement le guide pratique du travail en équipe, mémorise le Code d'Honneur et la recette secrète d'un super projet, puis réessaie le test.";
+            }
+        }
+
+        function restartQuiz() {
+            initQuiz();
+        }
+
+        window.addEventListener('DOMContentLoaded', initQuiz);
+    </script>
+</body>
+</html>
